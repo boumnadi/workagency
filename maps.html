@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <style type="text/css">
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 40%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 50%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .custom-map-control-button {
+        background-color: gray;
+        border: 0;
+        border-radius: 2px;
+        box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+        margin: 10px;
+        padding: 0 0.5em;
+        font: 400 18px Roboto, Arial, sans-serif;
+        overflow: hidden;
+        height: 40px;
+        cursor: pointer;
+      }
+      .custom-map-control-button:hover {
+        background: black;
+      }
+     /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+top: 30px;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #floating-panel {
+        position: absolute;
+        top: 0px;
+        left: 25%;
+        z-index: 5;
+        background-color: blue;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: "Roboto", "sans-serif";
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      #floating-panel {
+        margin-left: -180px;
+      }
+ #floating {
+        position: absolute;
+        top: 0px;
+        left: 25%;
+        z-index: 5;
+        background-color: red;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: "Roboto", "sans-serif";
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      #floating {
+        margin-left: -50px;
+      }
+  #float {
+        position: absolute;
+        top: 0px;
+        left: 25%;
+        z-index: 5;
+        background-color: green;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: "Roboto", "sans-serif";
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      #float {
+        margin-left: 125px;
+      }
+    </style>
+    <script>
+      // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.
+      let map, infoWindow;
+
+const neighborhood = [
+        { lat: 33.89654001211866, lng: -5.563344649874997  },
+        { lat: 31.93638962235078,  lng:-4.4220049678786095 },
+        { lat: 31.931363593696023, lng:-4.42672565572331 },
+        { lat: 31.91602886668565,  lng:-4.462946206080931},
+        { lat:31.944293735108857,  lng:-4.653059377341512},
+        { lat: 32.29466944999766,  lng: -4.500260324200961},
+        { lat: 31.4134647799711,  lng: -4.2470443316991755},
+        { lat:33.10375344650533,  lng: -7.534400393586023},
+        { lat:27.137770771592695,  lng: -27.137770771592695},
+        { lat:23.555035315014514,  lng: -15.821659832169013},
+        { lat:21.42286003842146,  lng: -16.975582000688934},
+  
+        { lat: 27.35813040900087,  lng: -11.825586226690625},
+        { lat: 27.41466682917417,  lng: -12.175785267700912},
+        { lat:  32.736148073541,  lng: -4.783877279844141},
+        { lat: 31.668820532094923,  lng: -4.640420707637905},
+        { lat:  31.879836186094344,  lng: -4.659059108907677},
+        { lat:  31.640754266956566,  lng: -7.9644155899878175},
+        { lat: 31.99170154845737,  lng: -5.009958085196299},
+        
+      ];
+
+      let markers = [];
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 31.91, lng:  -4.450 },
+          zoom: 12,
+        });
+        infoWindow = new google.maps.InfoWindow();
+        const locationButton = document.createElement("button");
+        locationButton.textContent = "GET POSITION";
+        locationButton.classList.add("custom-map-control-button");
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(
+          locationButton
+        );
+        locationButton.addEventListener("click", () => {
+          // Try HTML5 geolocation.
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const pos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                };
+                infoWindow.setPosition(pos);
+                infoWindow.setContent("localisation");
+                infoWindow.open(map);
+                map.setCenter(pos);
+              },
+              () => {
+                handleLocationError(true, infoWindow, map.getCenter());
+              }
+            );
+          } else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, map.getCenter());
+          }
+        });
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(
+          browserHasGeolocation
+            ? "Error: The Geolocation service failed."
+            : "Error: Your browser doesn't support geolocation."
+        );
+        infoWindow.open(map);
+      }
+     
+   
+
+      function drop() {
+        clearMarkers();
+
+        for (let i = 0; i < neighborhoods.length; i++) {
+          addMarkerWithTimeout(neighborhoods[i], i * 200);
+       
+      }
+      function addMarkerWithTimeout(position, timeout) {
+        window.setTimeout(() => {
+markers.push(
+            new google.maps.Marker({
+ 
+     icon:{
+                path: 'M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z',
+                fillColor: 'RED',
+                fillOpacity: 1.0,
+                strokeColor: 'red',
+                strokeWeight: 2,
+                scale: 2,
+                anchor: new google.maps.Point(12, 24),
+            },
+   position: position,
+              map,
+             
+              animation: google.maps.Animation.DROP,
+            })
+          );
+        }, timeout);
+      }
+
+      function clearMarkers() {
+        for (let i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+        markers = [];
+      }
+ }
+ 
+  function dro() {
+        clearMarkers();
+
+        for (let i = 0; i < neighborhood.length; i++) {
+          addMarkerWithTimeout(neighborhood[i], i * 200);
+        }
+      }
+//////////////////////////////////////////////////////////////1111
+      function addMarkerWithTimeout(position, timeout) {
+        window.setTimeout(() => {
+          markers.push(
+            new google.maps.Marker({
+ 
+    icon: {
+        path: 'M10,1.375c-3.17,0-5.75,2.548-5.75,5.682c0,6.685,5.259,11.276,5.483,11.469c0.152,0.132,0.382,0.132,0.534,0c0.224-0.193,5.481-4.784,5.483-11.469C15.75,3.923,13.171,1.375,10,1.375 M10,17.653c-1.064-1.024-4.929-5.127-4.929-10.596c0-2.68,2.212-4.861,4.929-4.861s4.929,2.181,4.929,4.861C14.927,12.518,11.063,16.627,10,17.653 M10,3.839c-1.815,0-3.286,1.47-3.286,3.286s1.47,3.286,3.286,3.286s3.286-1.47,3.286-3.286S11.815,3.839,10,3.839 M10,9.589c-1.359,0-2.464-1.105-2.464-2.464S8.641,4.661,10,4.661s2.464,1.105,2.464,2.464S11.359,9.589,10,9.589',
+        strokeColor: "BLUE",
+        scale: 2
+    },
+              position: position,
+              map,
+              animation: google.maps.Animation.DROP,
+ 
+            })
+          );
+        }, timeout);
+      }
+
+      function clearMarkers() {
+        for (let i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+        markers = [];
+      }
+ /////////////////////////
+
+      function dropp() {
+        clearMarkers();
+
+        for (let i = 0; i < neighborhoodd.length; i++) {
+          addMarkerWithTimeout(neighborhoodd[i], i * 200);
+       
+      }
+      function addMarkerWithTimeout(position, timeout) {
+        window.setTimeout(() => {
+markers.push(
+            new google.maps.Marker({
+ 
+     icon:{
+                path:'M15.62,1.825H4.379v1.021h0.13c-0.076,0.497-0.13,1.005-0.13,1.533c0,3.998,2.246,7.276,5.11,7.629v5.145 H7.445c-0.282,0-0.511,0.229-0.511,0.512s0.229,0.511,0.511,0.511h5.109c0.281,0,0.512-0.229,0.512-0.511s-0.23-0.512-0.512-0.512 h-2.043v-5.145c2.864-0.353,5.109-3.631,5.109-7.629c0-0.528-0.054-1.036-0.129-1.533h0.129V1.825z M10,11.087 c-2.586,0-4.684-3.003-4.684-6.707c0-0.53,0.057-1.039,0.138-1.533h9.092c0.081,0.495,0.139,1.003,0.139,1.533 C14.685,8.084,12.586,11.087,10,11.087z',
+                fillColor: 'green',
+                fillOpacity: 1.0,
+                strokeColor: 'green',
+                strokeWeight: 2,
+                scale: 2,
+                anchor: new google.maps.Point(12, 24),
+            },
+   position: position,
+              map,
+             
+              animation: google.maps.Animation.DROP,
+            })
+          );
+        }, timeout);
+      }
+
+      function clearMarkers() {
+        for (let i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+        markers = [];
+      }
+ }
+ 
+ 
+     
+    </script>
+
+  </head>
+  <body >
+        <div id="floating-panel">
+      <button id="dro" onclick="dro()">AGENCE DE TRAVAIL</button>
+    </div>
+
+   <center><div id='map' style='width: 800px; height: 600px;'></div></center>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgueU8SmVD2sxXyQ_8cTHthFyOLRtntEQ&callback=initMap&libraries=&v=weekly"
+      async
+    >
+
+</script>
+  </body>
+</html
